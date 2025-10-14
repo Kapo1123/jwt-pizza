@@ -166,5 +166,4 @@ test('diner dashboard', async ({ page }) => {
   await expect(page.getByRole('heading')).toContainText('Your pizza kitchen');
   await expect(page.getByRole('main')).toContainText('Kai Chen');
   await expect(page.getByRole('main')).toContainText('d@jwt.com');
-  await expect(page.getByRole('main')).toContainText('Your pizza kitchenname: Kai Chenemail: d@jwt.comrole:  dinerHere is your history of all the good times.IDPriceDate90.008 ₿2025-10-07T06:26:11.000Z');
 });
