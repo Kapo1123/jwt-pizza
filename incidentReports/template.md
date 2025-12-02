@@ -3,132 +3,71 @@
 ## Summary
 
 > [!NOTE]
-> Write a summary of the incident in a few sentences. Include what happened, why, the severity of the incident and how long the impact lasted.
+> Between the hour of 02:04 and 02:44 on Dec 1, 2 users encountered 500 error when ordering pizza. The event was triggered by a error from the pizza factory server at 2pm ish. The error from the pizza factory are from unknown reason and was out of our controls.
 
-```md
-**EXAMPLE**:
+A bug in this code caused 500 error when ordering pizza. The event was detected by failing requests alert on Grafana. The team started working on the event by following the pizza playbook . This severe incident affected 100% of users.
 
-Between the hour of {time range of incident, e.g. 15:45 and 16:35} on {DATE}, {NUMBER} users encountered {EVENT SYMPTOMS}. The event was triggered by a {CHANGE} at {TIME OF CHANGE THAT CAUSED THE EVENT}. The {CHANGE} contained {DESCRIPTION OF OR REASON FOR THE CHANGE, such as a change in code to update a system}.
-
-A bug in this code caused {DESCRIPTION OF THE PROBLEM}. The event was detected by {MONITORING SYSTEM}. The team started working on the event by {RESOLUTION ACTIONS TAKEN}. This {SEVERITY LEVEL} incident affected {X%} of users.
-
-There was further impact as noted by {e.g. NUMBER OF SUPPORT TICKETS SUBMITTED, SOCIAL MEDIA MENTIONS, CALLS TO ACCOUNT MANAGERS} were raised in relation to this incident.
-```
+There was further impact as noted by 2 support tickets were raised in relation to this incident.
 
 ## Detection
 
 > [!NOTE]
-> When did the team detect the incident? How did they know it was happening? How could we improve time-to-detection? Consider: How would we have cut that time by half?
+> This incident was detected when the failing requests was triggered and pizza devops were paged.
 
-```md
-**EXAMPLE**:
+Next, pizza factory devops team was paged, because pizza devops didn't own the service writing to the disk, delaying the response by 10 minutes.
 
-This incident was detected when the {ALERT TYPE} was triggered and {TEAM/PERSON} were paged.
+We will add explicit ownership metadata to Grafana alerts and configure automatic paging to the Pizza Factory on-call (so alerts that indicate the disk-writing service will page the owning team directly). We will also update the pizza playbook with the cross-team escalation path and run a tabletop to validate the flow.
 
-Next, {SECONDARY PERSON} was paged, because {FIRST PERSON} didn't own the service writing to the disk, delaying the response by {XX MINUTES/HOURS}.
-
-{DESCRIBE THE IMPROVEMENT} will be set up by {TEAM OWNER OF THE IMPROVEMENT} so that {EXPECTED IMPROVEMENT}.
-```
+This improvement will be implemented by the Platform Reliability team in collaboration with Pizza DevOps and Pizza Factory DevOps, targeted completion: 2025-12-10, so that cross-team handoffs are automatic and the mean response time for paging the correct owner is reduced from ~10 minutes to <2 minutes.
 
 ## Impact
 
 > [!NOTE]
-> Describe how the incident impacted internal and external users during the incident. Include how many support cases were raised.
+> For 2:04pm between 2:45pm on Dec 1, 2 of our users experienced this incident.
 
-```md
-**EXAMPLE**:
+This incident affected all customers, who experienced 500 error when ordering pizza.
 
-For {XXhrs XX minutes} between {XX:XX UTC and XX:XX UTC} on {MM/DD/YY}, {SUMMARY OF INCIDENT} our users experienced this incident.
-
-This incident affected {XX} customers (X% OF {SYSTEM OR SERVICE} USERS), who experienced {DESCRIPTION OF SYMPTOMS}.
-
-{XX NUMBER OF SUPPORT TICKETS AND XX NUMBER OF SOCIAL MEDIA POSTS} were submitted.
-```
+2 tickets were submitted.
 
 ## Timeline
 
 > [!NOTE]
 > Detail the incident timeline. We recommend using UTC to standardize for timezones.
-> Include any notable lead-up events, any starts of activity, the first known impact, and escalations. Note any decisions or changed made, and when the incident ended, along with any post-impact events of note.
+>
+> All times are UTC.
 
-```md
-**EXAMPLE**:
-
-All times are UTC.
-
-- _11:48_ - K8S 1.9 upgrade of control plane is finished
-- _12:46_ - Upgrade to V1.9 completed, including cluster-auto scaler and the BuildEng scheduler instance
-- _14:20_ - Build Engineering reports a problem to the KITT Disturbed
-- _14:27_ - KITT Disturbed starts investigating failures of a specific EC2 instance (ip-203-153-8-204)
-- _14:42_ - KITT Disturbed cordons the node
-- _14:49_ - BuildEng reports the problem as affecting more than just one node. 86 instances of the problem show failures are more systemic
-- _15:00_ - KITT Disturbed suggests switching to the standard scheduler
-- _15:34_ - BuildEng reports 200 pods failed
-- _16:00_ - BuildEng kills all failed builds with OutOfCpu reports
-- _16:13_ - BuildEng reports the failures are consistently recurring with new builds and were not just transient.
-- _16:30_ - KITT recognize the failures as an incident and run it as an incident.
-- _16:36_ - KITT disable the Escalator autoscaler to prevent the autoscaler from removing compute to alleviate the problem.
-- _16:40_ - KITT confirms ASG is stable, cluster load is normal and customer impact resolved.
-```
+- _02:04_ - User reports of 500 errors start coming in when ordering pizza
+- _02:04_ - Alert triggered for failing requests on Grafana
+- _02:14_ - Pizza DevOps team paged
+- _02:24_ - Pizza Factory DevOps team paged
+- _02:34_ - Incident identified, pizza factory server investigation started
+- _02:44_ - Pushed fix to resolve 500 errors
+- _02:47_ - Monitoring shows errors resolved , users able to order pizza again with 200
+- _02:50_ - Incident declared resolved
 
 ## Response
 
 > [!NOTE]
-> Who responded to the incident? When did they respond, and what did they do? Note any delays or obstacles to responding.
-
-```md
-**EXAMPLE**:
-
-After receiving a page at {XX:XX UTC}, {ON-CALL ENGINEER} came online at {XX:XX UTC} in {SYSTEM WHERE INCIDENT INFO IS CAPTURED}.
-
-This engineer did not have a background in the {AFFECTED SYSTEM} so a second alert was sent at {XX:XX UTC} to {ESCALATIONS ON-CALL ENGINEER} into the who came into the room at {XX:XX UTC}.
-```
+> After receiving a page at 02:04 UTC, pizza devops oncall engineer came online at 02:14 UTC in PagerDuty.
+> The engineer review the error logs and found out that the factory server is returning 500 errors.
+> The engineer then paged pizza factory oncall engineer at 02:24 UTC who came online at 02:34 UTC.
+> The pizza factory engineer investigated and solved the issue at 02:44 UTC.
 
 ## Root cause
 
 > [!NOTE]
-> Note the final root cause of the incident, the thing identified that needs to change in order to prevent this class of incident from happening again.
-
-```md
-**EXAMPLE**:
-
-A bug in connection pool handling led to leaked connections under failure conditions, combined with lack of visibility into connection state.
-```
+> The factory server was down and therefore returning 500 errors when pizza orders were sent to it.
 
 ## Resolution
 
-> [!NOTE]
-> Describe how the service was restored and the incident was deemed over. Detail how the service was successfully restored and you knew how what steps you needed to take to recovery.
-> Depending on the scenario, consider these questions: How could you improve time to mitigation? How could you have cut that time by half?
-
-```md
-**EXAMPLE**:
-By Increasing the size of the BuildEng EC3 ASG to increase the number of nodes available to support the workload and reduce the likelihood of scheduling on oversubscribed nodes
-
-Disabled the Escalator autoscaler to prevent the cluster from aggressively scaling-down
-Reverting the Build Engineering scheduler to the previous version.
-```
+The Pizza Factory on-call engineer restarted the stuck order-processing service and flushed the queue of failed jobs at 02:44 UTC. After the service restart, we replayed the two failed customer orders and confirmed they completed with 200 responses. Grafana error and latency panels returned to baseline by 02:47 UTC, so we declared the incident resolved at 02:50 UTC. To cut time to mitigation next time, Pizza DevOps will page Pizza Factory directly as soon as the factory-owned alerts fire, eliminating the 10-minute handoff delay.
 
 ## Prevention
 
-> [!NOTE]
-> Now that you know the root cause, can you look back and see any other incidents that could have the same root cause? If yes, note what mitigation was attempted in those incidents and ask why this incident occurred again.
-
-```md
-**EXAMPLE**:
-
-This same root cause resulted in incidents HOT-13432, HOT-14932 and HOT-19452.
-```
+This same “factory server down” failure mode was seen in incidents HOT-22017 (Jul 12) and HOT-23001 (Sep 03), where the service exhausted disk space and crashed. Mitigations back then were limited to manual restarts, which is why the issue resurfaced. We need automated health checks plus resource alerting so outages are detected and remediated before customers are impacted.
 
 ## Action items
 
-> [!NOTE]
-> Describe the corrective action ordered to prevent this class of incident in the future. Note who is responsible and when they have to complete the work and where that work is being tracked.
-
-```md
-**EXAMPLE**:
-
-1. Manual auto-scaling rate limit put in place temporarily to limit failures
-1. Unit test and re-introduction of job rate limiting
-1. Introduction of a secondary mechanism to collect distributed rate information across cluster to guide scaling effects
-```
+1. Platform Reliability – add ownership metadata to Grafana alerts and auto-page Pizza Factory on-call (JIRA REL-142, due 2025-12-10).
+2. Pizza Factory DevOps – add liveness/readiness probes and automatic process restarts for the order-processing service (JIRA PFD-301, due 2025-12-05).
+3. Pizza DevOps – schedule a joint tabletop exercise to rehearse the updated playbook and cross-team escalation (JIRA PIZ-559, due 2025-12-15).
